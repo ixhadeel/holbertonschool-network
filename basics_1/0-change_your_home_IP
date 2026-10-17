@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
-# Change localhost and facebook.com IP mappings
-sed -i 's/^127\.0\.0\.1[[:space:]]\+localhost/127.0.0.2 localhost/' /etc/hosts
-sed -i '/facebook\.com/d' /etc/hosts
-echo '8.8.8.8 facebook.com' >> /etc/hosts
+# Configure localhost and facebook.com IP addresses
+awk '
+{
+    for (i = 2; i <= NF; i++) {
+        if ($i == "localhost" || $i == "facebook.com") {
+            next
+        }
+    }
+    print
+}
+END {
+    print "127.0.0.2 localhost"
+    print "8.8.8.8 facebook.com"
+}
+' /etc/hosts > /tmp/hosts_network_updated
+cat /tmp/hosts_network_updated > /etc/hosts
+rm -f /tmp/hosts_network_updated
